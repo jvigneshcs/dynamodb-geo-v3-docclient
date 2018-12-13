@@ -1,47 +1,46 @@
 import {
-  AttributeValue,
-  BatchWriteItemOutput,
-  DeleteItemInput,
-  DeleteItemOutput,
-  GetItemInput,
-  GetItemOutput,
-  PutItemOutput,
-  PutRequest,
-  QueryInput,
-  QueryOutput,
-  UpdateItemInput,
-  UpdateItemOutput,
-} from "@aws-sdk/client-dynamodb";
+  QueryCommandInput,
+  QueryCommandOutput,
+  DeleteCommandOutput,
+  BatchWriteCommandOutput,
+  DeleteCommandInput,
+  GetCommandInput,
+  GetCommandOutput,
+  PutCommandInput,
+  PutCommandOutput,
+  UpdateCommandInput,
+  UpdateCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
+import { NativeAttributeValue } from "@aws-sdk/util-dynamodb";
 
-export interface BatchWritePointOutput extends BatchWriteItemOutput {}
+export interface BatchWritePointOutput extends BatchWriteCommandOutput {}
 
 export interface DeletePointInput {
-  RangeKeyValue: AttributeValue;
+  RangeKeyValue: NativeAttributeValue;
   GeoPoint: GeoPoint;
-  DeleteItemInput?: DeleteItemInput;
+  DeleteItemInput?: DeleteCommandInput;
 }
-export interface DeletePointOutput extends DeleteItemOutput {}
-
+export interface DeletePointOutput extends DeleteCommandOutput {}
 export interface GeoPoint {
   latitude: number;
   longitude: number;
 }
 export interface GeoQueryInput {
-  QueryInput?: QueryInput;
+  QueryInput?: QueryCommandInput;
 }
-export interface GeoQueryOutput extends QueryOutput {}
+export interface GeoQueryOutput extends QueryCommandOutput {}
 export interface GetPointInput {
-  RangeKeyValue: AttributeValue;
+  RangeKeyValue: NativeAttributeValue;
   GeoPoint: GeoPoint;
-  GetItemInput: GetItemInput;
+  GetItemInput: GetCommandInput;
 }
-export interface GetPointOutput extends GetItemOutput {}
+export interface GetPointOutput extends GetCommandOutput {}
 export interface PutPointInput {
-  RangeKeyValue: AttributeValue;
+  RangeKeyValue: NativeAttributeValue;
   GeoPoint: GeoPoint;
-  PutItemInput: PutRequest;
+  PutItemInput: Omit<PutCommandInput, "TableName">;
 }
-export interface PutPointOutput extends PutItemOutput {}
+export interface PutPointOutput extends PutCommandOutput {}
 export interface QueryRadiusInput extends GeoQueryInput {
   RadiusInMeter: number;
   CenterPoint: GeoPoint;
@@ -53,14 +52,8 @@ export interface QueryRectangleInput extends GeoQueryInput {
 }
 export interface QueryRectangleOutput extends GeoQueryOutput {}
 export interface UpdatePointInput {
-  RangeKeyValue: AttributeValue;
+  RangeKeyValue: NativeAttributeValue;
   GeoPoint: GeoPoint;
-  UpdateItemInput: UpdateItemInput;
+  UpdateItemInput: UpdateCommandInput;
 }
-export interface UpdatePointOutput extends UpdateItemOutput {}
-
-export interface Item {
-  [key: string]: AttributeValue;
-}
-
-export type ItemList = Item[];
+export interface UpdatePointOutput extends UpdateCommandOutput {}

@@ -4,15 +4,15 @@ const {
   GeoTableUtil,
 } = require("dynamodb-geo-v3");
 const {
-  DynamoDB,
   DynamoDBClient,
   Endpoint,
   waitUntilTableExists,
 } = require("@aws-sdk/client-dynamodb");
+const { DynamoDbDocumentClient } = require("@aws-sdk/lib-dynamodb");
 const uuid = require("uuid");
 
 // Use a local DB for the example.
-const ddb = new DynamoDB({
+const db = new DynamoDBClient({
   credentials: {
     accessKeyId: YOUR_AWS_KEY_ID,
     secretAccessKey: YOUR_AWS_SECRET_ACCESS_KEY,
@@ -28,6 +28,9 @@ const ddbClient = new DynamoDBClient({
   endpoint: new Endpoint("http://localhost:8000"),
   region: YOUR_AWS_REGION,
 });
+
+// Use a local DB for the example.
+const ddb = DynamoDbDocumentClient.from(db);
 
 // Configuration for a new instance of a GeoDataManager. Each GeoDataManager instance represents a table
 const config = new GeoDataManagerConfiguration(ddb, "capitals");
@@ -47,12 +50,12 @@ console.dir(createTableInput, { depth: null });
 // Create the table
 ddb
   .createTable(createTableInput)
+  .promise()
   // Wait for it to become ready
   .then(function () {
-    return waitUntilTableExists(
-      { client: ddbClient, maxWaitTime: 30000 },
-      { TableName: config.tableName }
-    );
+    return ddb
+      .waitFor("tableExists", { TableName: config.tableName })
+      .promise();
   })
   // Load sample data in batches
   .then(function () {
@@ -60,15 +63,15 @@ ddb
     const data = require("./capitals.json");
     const putPointInputs = data.map(function (capital) {
       return {
-        RangeKeyValue: { S: uuid.v4() }, // Use this to ensure uniqueness of the hash/range pairs.
+        RangeKeyValue: uuid.v4(), // Use this to ensure uniqueness of the hash/range pairs.
         GeoPoint: {
           latitude: capital.latitude,
           longitude: capital.longitude,
         },
         PutItemInput: {
           Item: {
-            country: { S: capital.country },
-            capital: { S: capital.capital },
+            country: capital.country,
+            capital: capital.capital,
           },
         },
       };
