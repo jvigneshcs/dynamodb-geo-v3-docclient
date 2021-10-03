@@ -1,6 +1,6 @@
 {
-  "name": "dynamodb-geo",
-  "version": "0.4.0",
+  "name": "dynamodb-geo-v3",
+  "version": "1.0.0",
   "description": "A javascript port of awslabs/dynamodb-geo, for dynamodb geospatial querying",
   "scripts": {
     "prepublish": "tsc -d",
@@ -10,8 +10,8 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": "rh389/dynamodb-geo.js",
-  "author": "Rob Hogan <github@rhogan.net>",
+  "repository": "renet/dynamodb-geo-v3",
+  "author": "René Schubert <reneschubert@gmx.de>",
   "license": "Apache-2.0",
   "dependencies": {
     "@types/long": ">=3",

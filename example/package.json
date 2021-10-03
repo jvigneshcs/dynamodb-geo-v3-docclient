@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "aws-sdk": "^2.48.0",
+    "@aws-sdk/client-dynamodb": "^3.34.0",
     "dynamodb-geo": "*",
     "uuid": "^3.0.1"
   }

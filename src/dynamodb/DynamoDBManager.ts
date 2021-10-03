@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-import { GeoDataManagerConfiguration } from "../GeoDataManagerConfiguration";
 import {
   AttributeValue,
   Condition,
@@ -23,6 +22,8 @@ import {
   QueryOutput,
   WriteRequest,
 } from "@aws-sdk/client-dynamodb";
+import * as Long from "long";
+import { GeoDataManagerConfiguration } from "../GeoDataManagerConfiguration";
 import {
   DeletePointInput,
   GetPointInput,
@@ -32,7 +33,6 @@ import {
 } from "../types";
 import { S2Manager } from "../s2/S2Manager";
 import { GeohashRange } from "../model/GeohashRange";
-import * as Long from "long";
 
 export class DynamoDBManager {
   private config: GeoDataManagerConfiguration;
