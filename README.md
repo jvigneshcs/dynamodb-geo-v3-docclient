@@ -15,7 +15,14 @@ This project is an unofficial port of [awslabs/dynamodb-geo][dynamodb-geo], brin
 ## Installation
 
 Using [npm] or [yarn]:
-`npm install --save dynamodb-geo-v3` or `yarn add dynamodb-geo-v3`.
+
+```sh
+npm install --save dynamodb-geo-v3
+
+# or
+
+yarn add dynamodb-geo-v3
+```
 
 ## Getting started
 
@@ -87,14 +94,11 @@ console.dir(createTableInput, { depth: null });
 // Create the table
 ddb
   .createTable(createTableInput)
-  .promise()
   // Wait for it to become ready
-  .then(function () {
-    return ddb
-      .waitFor("tableExists", { TableName: config.tableName })
-      .promise();
+  .then(() => {
+    return ddb.waitFor("tableExists", { TableName: config.tableName });
   })
-  .then(function () {
+  .then(() => {
     console.log("Table created and ready!");
   });
 ```
@@ -120,8 +124,7 @@ myGeoTableManager
       // ... Anything else to pass through to `putItem`, eg ConditionExpression
     },
   })
-  .promise()
-  .then(function () {
+  .then(() => {
     console.log("Done!");
   });
 ```
@@ -151,8 +154,7 @@ myGeoTableManager
       },
     },
   })
-  .promise()
-  .then(function () {
+  .then(() => {
     console.log("Done!");
   });
 ```
@@ -177,8 +179,7 @@ myGeoTableManager
       ConditionExpression: "attribute_not_exists(country)",
     },
   })
-  .promise()
-  .then(function () {
+  .then(() => {
     console.log("Done!");
   });
 ```
