@@ -59,7 +59,7 @@ export class GeoDataManagerConfiguration {
 
   S2RegionCoverer: typeof S2RegionCoverer;
 
-  constructor(documentClient, tableName: string) {
+  constructor(documentClient: DynamoDBDocumentClient, tableName: string) {
     this.documentClient = documentClient;
     this.tableName = tableName;
     this.S2RegionCoverer = S2RegionCoverer;

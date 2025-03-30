@@ -87,8 +87,8 @@ export class DynamoDBManager {
         KeyConditions: keyConditions,
         IndexName: this.config.geohashIndexName,
         ConsistentRead: this.config.consistentRead,
-        ReturnConsumedCapacity: "TOTAL",
-        ...(lastEvaluatedKey && { lastEvaluatedKey: lastEvaluatedKey }),
+        ReturnConsumedCapacity: "TOTAL" as const,
+        ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey }),
       };
       const queryCommand = new QueryCommand({ ...defaults, ...queryInput });
       const queryOutput = await this.config.documentClient.send(queryCommand);

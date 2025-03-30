@@ -68,7 +68,7 @@ export class GeohashRange {
    * min: -123999999
    * max: -123456789
    */
-  public trySplit(hashKeyLength): GeohashRange[] {
+  public trySplit(hashKeyLength: number): GeohashRange[] {
     const result: GeohashRange[] = [];
 
     const minHashKey = S2Manager.generateHashKey(this.rangeMin, hashKeyLength);
