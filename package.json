@@ -18,12 +18,12 @@
     "nodes2ts": "^2.0.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.0.0",
-    "@types/mocha": "^2.2.41",
+    "@types/chai": "^5.2.1",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.13.14",
-    "chai": "^4.0.1",
+    "chai": "^5.2.0",
     "mocha": "^11.1.0",
-    "ts-node": "^10.2.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
