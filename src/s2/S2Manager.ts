@@ -14,14 +14,15 @@
  */
 
 import { s2 } from "s2js";
-const { Cell: S2Cell, LatLng: S2LatLng } = s2;
 import { GeoPoint } from "../types";
 import Long from "long";
 
+const { Cell, LatLng } = s2;
+
 export class S2Manager {
   static generateGeohash(geoPoint: GeoPoint) {
-    const latLng = S2LatLng.fromDegrees(geoPoint.latitude, geoPoint.longitude);
-    const cell = S2Cell.fromLatLng(latLng);
+    const latLng = LatLng.fromDegrees(geoPoint.latitude, geoPoint.longitude);
+    const cell = Cell.fromLatLng(latLng);
     const cellId = cell.id; // This is already a bigint in s2js
     return cellId;
   }
