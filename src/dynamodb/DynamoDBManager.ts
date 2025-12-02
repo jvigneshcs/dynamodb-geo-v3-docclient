@@ -63,13 +63,6 @@ export class DynamoDBManager {
     const queryOutputs: QueryCommandOutput[] = [];
 
     const nextQuery = async (lastEvaluatedKey = null) => {
-      const keyConditions: { [key: string]: any } = {};
-
-      keyConditions[this.config.hashKeyAttributeName] = {
-        ComparisonOperator: "EQ",
-        AttributeValueList: [parseFloat(hashKey.toString(10))],
-      };
-
       const minRange: NativeAttributeValue = BigInt(
         range.rangeMin.toString(10)
       );
@@ -77,14 +70,18 @@ export class DynamoDBManager {
         range.rangeMax.toString(10)
       );
 
-      keyConditions[this.config.geohashAttributeName] = {
-        ComparisonOperator: "BETWEEN",
-        AttributeValueList: [minRange, maxRange],
-      };
-
       const defaults = {
         TableName: this.config.tableName,
-        KeyConditions: keyConditions,
+        KeyConditionExpression: "#hk = :hashKey AND #gh BETWEEN :minRange AND :maxRange",
+        ExpressionAttributeNames: {
+          "#hk": this.config.hashKeyAttributeName,
+          "#gh": this.config.geohashAttributeName,
+        },
+        ExpressionAttributeValues: {
+          ":hashKey": parseFloat(hashKey.toString(10)),
+          ":minRange": minRange,
+          ":maxRange": maxRange,
+        },
         IndexName: this.config.geohashIndexName,
         ConsistentRead: this.config.consistentRead,
         ReturnConsumedCapacity: "TOTAL" as const,
@@ -209,15 +206,52 @@ export class DynamoDBManager {
     updatePointInput.UpdateItemInput.Key[this.config.rangeKeyAttributeName] =
       updatePointInput.RangeKeyValue;
 
-    // Geohash and geoJson cannot be updated.
+    // Geohash and geoJson cannot be updated - validate both old and new API patterns
+    const protectedAttributes = [
+      this.config.geohashAttributeName,
+      this.config.geoJsonAttributeName,
+    ];
+
+    // Check deprecated AttributeUpdates pattern
     if (updatePointInput.UpdateItemInput.AttributeUpdates) {
-      delete updatePointInput.UpdateItemInput.AttributeUpdates[
-        this.config.geohashAttributeName
-      ];
-      delete updatePointInput.UpdateItemInput.AttributeUpdates[
-        this.config.geoJsonAttributeName
-      ];
+      protectedAttributes.forEach((attr) => {
+        if (updatePointInput.UpdateItemInput.AttributeUpdates![attr]) {
+          throw new Error(
+            `Cannot update protected attribute: ${attr}. ` +
+            `The geohash and geoJson attributes are auto-generated and cannot be modified.`
+          );
+        }
+      });
     }
+
+    // Check modern UpdateExpression pattern
+    if (updatePointInput.UpdateItemInput.UpdateExpression) {
+      const updateExpression = updatePointInput.UpdateItemInput.UpdateExpression;
+      const attributeNames = updatePointInput.UpdateItemInput.ExpressionAttributeNames || {};
+
+      // Check if any protected attributes are referenced in the expression
+      protectedAttributes.forEach((attr) => {
+        // Check direct attribute name usage (not recommended but possible)
+        const directPattern = new RegExp(`\\b${attr}\\b`, 'i');
+        if (directPattern.test(updateExpression)) {
+          throw new Error(
+            `Cannot update protected attribute: ${attr}. ` +
+            `The geohash and geoJson attributes are auto-generated and cannot be modified.`
+          );
+        }
+
+        // Check if any placeholder in ExpressionAttributeNames maps to protected attribute
+        Object.entries(attributeNames).forEach(([placeholder, attributeName]) => {
+          if (attributeName === attr && updateExpression.includes(placeholder)) {
+            throw new Error(
+              `Cannot update protected attribute: ${attr} (referenced as ${placeholder}). ` +
+              `The geohash and geoJson attributes are auto-generated and cannot be modified.`
+            );
+          }
+        });
+      });
+    }
+
     const updateCommand = new UpdateCommand(updatePointInput.UpdateItemInput);
     return this.config.documentClient.send(updateCommand);
   }

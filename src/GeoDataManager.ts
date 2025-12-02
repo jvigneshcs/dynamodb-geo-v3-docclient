@@ -251,19 +251,19 @@ export class GeoDataManager {
    * <b>Sample usage:</b>
    *
    * <pre>
-   * GeoPoint geoPoint = new GeoPoint(47.5, -122.3);
-   *
-   * String rangeKey = &quot;a6feb446-c7f2-4b48-9b3a-0f87744a5047&quot;;
-   * AttributeValue rangeKeyValue = new AttributeValue().withS(rangeKey);
-   *
-   * UpdatePointRequest updatePointRequest = new UpdatePointRequest(geoPoint, rangeKeyValue);
-   *
-   * AttributeValue titleValue = new AttributeValue().withS(&quot;Updated title.&quot;);
-   * AttributeValueUpdate titleValueUpdate = new AttributeValueUpdate().withAction(AttributeAction.PUT)
-   *    .withValue(titleValue);
-   * updatePointRequest.getUpdateItemRequest().getAttributeUpdates().put(&quot;title&quot;, titleValueUpdate);
-   *
-   * UpdatePointResult updatePointResult = geoIndexManager.updatePoint(updatePointRequest);
+   * myGeoTableManager.updatePoint({
+   *   RangeKeyValue: 'a6feb446-c7f2-4b48-9b3a-0f87744a5047',
+   *   GeoPoint: {
+   *     latitude: 47.5,
+   *     longitude: -122.3
+   *   },
+   *   UpdateItemInput: {
+   *     UpdateExpression: 'SET title = :title',
+   *     ExpressionAttributeValues: {
+   *       ':title': 'Updated title.'
+   *     }
+   *   }
+   * });
    * </pre>
    *
    * @param updatePointInput
