@@ -14,11 +14,13 @@
   "author": "Javier Espinoza Haussmann <javierieh@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@types/long": ">=3",
-    "nodes2ts": "^2.0.0"
+    "@types/long": "^4.0.2",
+    "long": "^5.3.2",
+    "s2js": "^1.43.6"
   },
   "devDependencies": {
     "@types/chai": "^5.2.1",
+    "@types/geojson": "^7946.0.16",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.13.14",
     "chai": "^5.2.0",

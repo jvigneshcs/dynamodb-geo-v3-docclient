@@ -1,16 +1,23 @@
 import { QueryRadiusInput, QueryRectangleInput } from "../types";
-import { S2LatLng, S2LatLngRect } from "nodes2ts";
+import { s2, r1, s1 } from "s2js";
+const { LatLng: S2LatLng, Rect: S2LatLngRect } = s2;
+
+// s2js Rect type
+type Rect = InstanceType<typeof S2LatLngRect>;
+
+// Earth radius in meters (s2js distance() returns radians)
+const EARTH_RADIUS_METERS = 6371000;
 
 export class S2Util {
   public static latLngRectFromQueryRectangleInput(
     geoQueryRequest: QueryRectangleInput
-  ): S2LatLngRect {
+  ): Rect {
     const queryRectangleRequest = geoQueryRequest as QueryRectangleInput;
 
     const minPoint = queryRectangleRequest.MinPoint;
     const maxPoint = queryRectangleRequest.MaxPoint;
 
-    let latLngRect: S2LatLngRect = null;
+    let latLngRect: Rect = null;
 
     if (minPoint != null && maxPoint != null) {
       const minLatLng = S2LatLng.fromDegrees(
@@ -22,7 +29,10 @@ export class S2Util {
         maxPoint.longitude
       );
 
-      latLngRect = S2LatLngRect.fromLatLng(minLatLng, maxLatLng);
+      // s2js: lat and lng are already in radians
+      const latInterval = new r1.Interval(minLatLng.lat, maxLatLng.lat);
+      const lngInterval = new s1.Interval(minLatLng.lng, maxLatLng.lng);
+      latLngRect = new S2LatLngRect(latInterval, lngInterval);
     }
 
     return latLngRect;
@@ -30,7 +40,7 @@ export class S2Util {
 
   public static getBoundingLatLngRectFromQueryRadiusInput(
     geoQueryRequest: QueryRadiusInput
-  ): S2LatLngRect {
+  ): Rect {
     const centerPoint = geoQueryRequest.CenterPoint;
     const radiusInMeter = geoQueryRequest.RadiusInMeter;
 
@@ -51,9 +61,9 @@ export class S2Util {
     );
 
     const latForRadius =
-      radiusInMeter / centerLatLng.getEarthDistance(latReferenceLatLng);
+      radiusInMeter / (centerLatLng.distance(latReferenceLatLng) * EARTH_RADIUS_METERS);
     const lngForRadius =
-      radiusInMeter / centerLatLng.getEarthDistance(lngReferenceLatLng);
+      radiusInMeter / (centerLatLng.distance(lngReferenceLatLng) * EARTH_RADIUS_METERS);
 
     const minLatLng = S2LatLng.fromDegrees(
       centerPoint.latitude - latForRadius,
@@ -64,6 +74,8 @@ export class S2Util {
       centerPoint.longitude + lngForRadius
     );
 
-    return S2LatLngRect.fromLatLng(minLatLng, maxLatLng);
+    const latInterval = new r1.Interval(minLatLng.lat, maxLatLng.lat);
+    const lngInterval = new s1.Interval(minLatLng.lng, maxLatLng.lng);
+    return new S2LatLngRect(latInterval, lngInterval);
   }
 }

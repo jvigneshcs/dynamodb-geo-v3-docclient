@@ -13,7 +13,8 @@
  * permissions and limitations under the License.
  */
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { S2RegionCoverer } from "nodes2ts";
+import { s2 } from "s2js";
+const { RegionCoverer: S2RegionCoverer } = s2;
 
 export class GeoDataManagerConfiguration {
   // Public constants

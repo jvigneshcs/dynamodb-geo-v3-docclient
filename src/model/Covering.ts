@@ -1,17 +1,22 @@
-import { S2CellId } from "nodes2ts";
+import { s2 } from "s2js";
+const { cellid } = s2;
 import { GeohashRange } from "./GeohashRange";
+import Long from "long";
 
 export class Covering {
-    private cellIds: S2CellId[];
+    private cellIds: bigint[];
 
-    constructor (cellIds: S2CellId[]) {
+    constructor (cellIds: bigint[]) {
         this.cellIds = cellIds;
     }
 
     public getGeoHashRanges(hashKeyLength: number) {
         const ranges: GeohashRange[] = [];
-        this.cellIds.forEach(outerRange => {
-            const hashRange = new GeohashRange(outerRange.rangeMin().id, outerRange.rangeMax().id);
+        this.cellIds.forEach(cellId => {
+            // s2js: cellId is bigint, use cellid functions to get range and convert to Long
+            const min = Long.fromString(s2.cellid.rangeMin(cellId).toString(), false, 10);
+            const max = Long.fromString(s2.cellid.rangeMax(cellId).toString(), false, 10);
+            const hashRange = new GeohashRange(min, max);
             ranges.push(...hashRange.trySplit(hashKeyLength));
         });
         return ranges;

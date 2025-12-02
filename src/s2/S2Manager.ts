@@ -13,16 +13,17 @@
  * permissions and limitations under the License.
  */
 
-import { S2Cell, S2LatLng } from "nodes2ts";
+import { s2 } from "s2js";
+const { Cell: S2Cell, LatLng: S2LatLng } = s2;
 import { GeoPoint } from "../types";
-import * as Long from "long";
+import Long from "long";
 
 export class S2Manager {
   static generateGeohash(geoPoint: GeoPoint) {
     const latLng = S2LatLng.fromDegrees(geoPoint.latitude, geoPoint.longitude);
     const cell = S2Cell.fromLatLng(latLng);
-    const cellId = cell.id;
-    return cellId.id;
+    const cellId = cell.id; // This is already a bigint in s2js
+    return cellId;
   }
 
   public static generateHashKey(geohash: Long, hashKeyLength: number) {

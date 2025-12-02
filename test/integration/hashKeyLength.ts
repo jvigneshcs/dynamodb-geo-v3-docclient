@@ -1,11 +1,12 @@
 import { expect } from "chai";
-import { S2RegionCoverer } from "nodes2ts";
+import { s2 } from "s2js";
+const { RegionCoverer: S2RegionCoverer } = s2;
 import { S2Util } from "../../src/s2/S2Util";
 import { Covering } from "../../src/model/Covering";
 
 describe('Appropriate hash key lengths', function () {
     it('1ft radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 0.3048,
             CenterPoint: {
                 latitude: 59,
@@ -23,7 +24,7 @@ describe('Appropriate hash key lengths', function () {
         expect(cov.getGeoHashRanges(16)).length(31);
     });    
     it('1m radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 1,
             CenterPoint: {
                 latitude: 59,
@@ -39,7 +40,7 @@ describe('Appropriate hash key lengths', function () {
         expect(cov.getGeoHashRanges(14)).length(12);
     });    
     it('10m radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 10,
             CenterPoint: {
                 latitude: 59,
@@ -56,7 +57,7 @@ describe('Appropriate hash key lengths', function () {
     });
 
     it('1km radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 1000,
             CenterPoint: {
                 latitude: 59,
@@ -73,7 +74,7 @@ describe('Appropriate hash key lengths', function () {
     });
 
     it('10km radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 10000,
             CenterPoint: {
                 latitude: 59,
@@ -92,7 +93,7 @@ describe('Appropriate hash key lengths', function () {
     });
 
     it('50km radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 50000,
             CenterPoint: {
                 latitude: 59,
@@ -110,7 +111,7 @@ describe('Appropriate hash key lengths', function () {
     });
 
     it('100km radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 100000,
             CenterPoint: {
                 latitude: 59,
@@ -127,7 +128,7 @@ describe('Appropriate hash key lengths', function () {
     });
 
     it('1000km radius', function () {
-        const cov = new Covering(new S2RegionCoverer().getCoveringCells(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
+        const cov = new Covering(new S2RegionCoverer().covering(S2Util.getBoundingLatLngRectFromQueryRadiusInput({
             RadiusInMeter: 1000000,
             CenterPoint: {
                 latitude: 59,

@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import * as Long from "long";
+import Long from "long";
 import { GeoDataManagerConfiguration } from "../GeoDataManagerConfiguration";
 import {
   DeletePointInput,
@@ -104,8 +104,9 @@ export class DynamoDBManager {
 
   public getPoint(getPointInput: GetPointInput) {
     const geohash = S2Manager.generateGeohash(getPointInput.GeoPoint);
+    const geohashLong = Long.fromString(geohash.toString(), false, 10);
     const hashKey = S2Manager.generateHashKey(
-      geohash,
+      geohashLong,
       this.config.hashKeyLength
     );
 
@@ -122,8 +123,9 @@ export class DynamoDBManager {
 
   public putPoint(putPointInput: PutPointInput) {
     const geohash = S2Manager.generateGeohash(putPointInput.GeoPoint);
+    const geohashLong = Long.fromString(geohash.toString(), false, 10);
     const hashKey = S2Manager.generateHashKey(
-      geohash,
+      geohashLong,
       this.config.hashKeyLength
     );
     const putItemInput: PutCommandInput = {
@@ -154,8 +156,9 @@ export class DynamoDBManager {
     const writeInputs = [];
     putPointInputs.forEach((putPointInput) => {
       const geohash = S2Manager.generateGeohash(putPointInput.GeoPoint);
+      const geohashLong = Long.fromString(geohash.toString(), false, 10);
       const hashKey = S2Manager.generateHashKey(
-        geohash,
+        geohashLong,
         this.config.hashKeyLength
       );
       const putItemInput = putPointInput.PutItemInput;
@@ -189,8 +192,9 @@ export class DynamoDBManager {
 
   public updatePoint(updatePointInput: UpdatePointInput) {
     const geohash = S2Manager.generateGeohash(updatePointInput.GeoPoint);
+    const geohashLong = Long.fromString(geohash.toString(), false, 10);
     const hashKey = S2Manager.generateHashKey(
-      geohash,
+      geohashLong,
       this.config.hashKeyLength
     );
 
@@ -220,8 +224,9 @@ export class DynamoDBManager {
 
   public deletePoint(deletePointInput: DeletePointInput) {
     const geohash = S2Manager.generateGeohash(deletePointInput.GeoPoint);
+    const geohashLong = Long.fromString(geohash.toString(), false, 10);
     const hashKey = S2Manager.generateHashKey(
-      geohash,
+      geohashLong,
       this.config.hashKeyLength
     );
     const deleteCommand = new DeleteCommand({

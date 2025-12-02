@@ -15,13 +15,14 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.S2Manager = void 0;
-const nodes2ts_1 = require("nodes2ts");
+const s2js_1 = require("s2js");
+const { Cell: S2Cell, LatLng: S2LatLng } = s2js_1.s2;
 class S2Manager {
     static generateGeohash(geoPoint) {
-        const latLng = nodes2ts_1.S2LatLng.fromDegrees(geoPoint.latitude, geoPoint.longitude);
-        const cell = nodes2ts_1.S2Cell.fromLatLng(latLng);
-        const cellId = cell.id;
-        return cellId.id;
+        const latLng = S2LatLng.fromDegrees(geoPoint.latitude, geoPoint.longitude);
+        const cell = S2Cell.fromLatLng(latLng);
+        const cellId = cell.id; // This is already a bigint in s2js
+        return cellId;
     }
     static generateHashKey(geohash, hashKeyLength) {
         if (geohash.lessThan(0)) {
