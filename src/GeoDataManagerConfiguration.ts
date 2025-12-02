@@ -14,7 +14,7 @@
  */
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { s2 } from "s2js";
-const { RegionCoverer: S2RegionCoverer } = s2;
+const { RegionCoverer } = s2;
 
 export class GeoDataManagerConfiguration {
   // Public constants
@@ -58,11 +58,11 @@ export class GeoDataManagerConfiguration {
 
   documentClient: DynamoDBDocumentClient;
 
-  S2RegionCoverer: typeof S2RegionCoverer;
+  S2RegionCoverer: typeof RegionCoverer;
 
   constructor(documentClient: DynamoDBDocumentClient, tableName: string) {
     this.documentClient = documentClient;
     this.tableName = tableName;
-    this.S2RegionCoverer = S2RegionCoverer;
+    this.S2RegionCoverer =  RegionCoverer;
   }
 }

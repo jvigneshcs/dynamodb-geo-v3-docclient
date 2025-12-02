@@ -1,5 +1,4 @@
 import { s2 } from "s2js";
-const { cellid } = s2;
 import { GeohashRange } from "./GeohashRange";
 import Long from "long";
 

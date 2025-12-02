@@ -28,13 +28,14 @@ import {
 import { S2Manager } from "./s2/S2Manager";
 import { S2Util } from "./s2/S2Util";
 import { s2 } from "s2js";
-const { LatLng: S2LatLng, Rect: S2LatLngRect } = s2;
-// s2js types
-type LatLng = InstanceType<typeof S2LatLng>;
-type Rect = InstanceType<typeof S2LatLngRect>;
 import { Covering } from "./model/Covering";
 import { QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { NativeAttributeValue } from "@aws-sdk/util-dynamodb";
+
+const { LatLng, Rect } = s2;
+// s2js types
+type LatLng = InstanceType<typeof LatLng>;
+type Rect = InstanceType<typeof Rect>;
 
 /**
  * <p>
@@ -352,7 +353,7 @@ export class GeoDataManager {
     let radiusInMeter = 0;
 
     const centerPoint: GeoPoint = geoQueryInput.CenterPoint;
-    centerLatLng = S2LatLng.fromDegrees(
+    centerLatLng = LatLng.fromDegrees(
       centerPoint.latitude,
       centerPoint.longitude
     );
@@ -364,7 +365,7 @@ export class GeoDataManager {
       const longitude = coordinates[this.config.longitudeFirst ? 0 : 1];
       const latitude = coordinates[this.config.longitudeFirst ? 1 : 0];
 
-      const latLng: LatLng = S2LatLng.fromDegrees(latitude, longitude);
+      const latLng: LatLng = LatLng.fromDegrees(latitude, longitude);
       // s2js distance() returns radians, multiply by Earth radius for meters
       const EARTH_RADIUS_METERS = 6371000;
       return centerLatLng.distance(latLng) * EARTH_RADIUS_METERS <= radiusInMeter;
@@ -391,7 +392,7 @@ export class GeoDataManager {
       const longitude = coordinates[this.config.longitudeFirst ? 0 : 1];
       const latitude = coordinates[this.config.longitudeFirst ? 1 : 0];
 
-      const latLng: LatLng = S2LatLng.fromDegrees(latitude, longitude);
+      const latLng: LatLng = LatLng.fromDegrees(latitude, longitude);
       return latLngRect.containsLatLng(latLng);
     });
   }
