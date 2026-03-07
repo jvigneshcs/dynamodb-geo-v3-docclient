@@ -1,6 +1,6 @@
 {
   "name": "dynamodb-geo-v3-document-client",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A javascript port of awslabs/dynamodb-geo, for dynamodb geospatial querying",
   "scripts": {
     "prepublish": "tsc -d",
@@ -17,25 +17,24 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@types/long": "^4.0.2",
     "long": "^5.3.2",
-    "s2js": "^1.43.6"
+    "s2js": "^1.44.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.940.0",
-    "@aws-sdk/lib-dynamodb": "^3.940.0",
-    "@aws-sdk/util-dynamodb": "^3.940.0",
+    "@aws-sdk/client-dynamodb": "^3.1004.0",
+    "@aws-sdk/lib-dynamodb": "^3.1004.0",
+    "@aws-sdk/util-dynamodb": "^3.996.2",
     "@types/chai": "^5.2.3",
     "@types/geojson": "^7946.0.16",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.10.1",
-    "chai": "^6.2.1",
+    "@types/node": "^25.3.5",
+    "chai": "^6.2.2",
     "mocha": "^11.7.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.940.0",
-    "@aws-sdk/lib-dynamodb": "^3.940.0"
+    "@aws-sdk/client-dynamodb": "^3.1004.0",
+    "@aws-sdk/lib-dynamodb": "^3.1004.0"
   }
 }
