@@ -19,12 +19,12 @@
   "dependencies": {
     "@types/long": "^4.0.2",
     "long": "^5.3.2",
-    "s2js": "^1.43.6"
+    "s2js": "^1.44.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.940.0",
-    "@aws-sdk/lib-dynamodb": "^3.940.0",
-    "@aws-sdk/util-dynamodb": "^3.940.0",
+    "@aws-sdk/client-dynamodb": "^3.1004.0",
+    "@aws-sdk/lib-dynamodb": "^3.1004.0",
+    "@aws-sdk/util-dynamodb": "^3.996.2",
     "@types/chai": "^5.2.3",
     "@types/geojson": "^7946.0.16",
     "@types/mocha": "^10.0.10",
@@ -35,7 +35,7 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.940.0",
-    "@aws-sdk/lib-dynamodb": "^3.940.0"
+    "@aws-sdk/client-dynamodb": "^3.1004.0",
+    "@aws-sdk/lib-dynamodb": "^3.1004.0"
   }
 }
