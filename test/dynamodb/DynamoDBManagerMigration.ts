@@ -68,6 +68,134 @@ describe("DynamoDB API Migration Tests", () => {
         ddbManager.queryGeohash(queryInput, hashKey, range);
       }).to.not.throw();
     });
+
+    it("should properly merge user-provided ExpressionAttributeNames with library's internal ones", async () => {
+      // This test verifies the fix for the merging bug
+      const hashKey = Long.fromNumber(123456);
+      const range = new GeohashRange(
+        Long.fromNumber(1000000),
+        Long.fromNumber(2000000)
+      );
+
+      const queryInput = {
+        FilterExpression: "#cat = :category AND #st = :status",
+        ExpressionAttributeNames: {
+          "#cat": "categoryId",
+          "#st": "status",
+        },
+        ExpressionAttributeValues: {
+          ":category": "food",
+          ":status": "active",
+        },
+      };
+
+      // Mock the send method to capture the QueryCommand
+      let capturedCommand: any = null;
+      const originalSend = mockDocClient.send.bind(mockDocClient);
+      mockDocClient.send = async (command: any) => {
+        capturedCommand = command;
+        // Return a minimal valid response to prevent errors
+        return {
+          Items: [],
+          Count: 0,
+          ScannedCount: 0,
+        };
+      };
+
+      try {
+        await ddbManager.queryGeohash(queryInput, hashKey, range);
+
+        // Verify the command was captured
+        expect(capturedCommand).to.exist;
+        expect(capturedCommand.input).to.exist;
+
+        // Verify library's internal aliases are present
+        expect(capturedCommand.input.ExpressionAttributeNames).to.include.keys(
+          "#hk",
+          "#gh"
+        );
+        expect(capturedCommand.input.ExpressionAttributeValues).to.include.keys(
+          ":hashKey",
+          ":minRange",
+          ":maxRange"
+        );
+
+        // Verify user's aliases are also present (merged, not overwritten)
+        expect(capturedCommand.input.ExpressionAttributeNames).to.include.keys(
+          "#cat",
+          "#st"
+        );
+        expect(capturedCommand.input.ExpressionAttributeValues).to.include.keys(
+          ":category",
+          ":status"
+        );
+
+        // Verify the values are correct
+        expect(capturedCommand.input.ExpressionAttributeNames["#cat"]).to.equal(
+          "categoryId"
+        );
+        expect(capturedCommand.input.ExpressionAttributeNames["#st"]).to.equal(
+          "status"
+        );
+        expect(capturedCommand.input.ExpressionAttributeValues[":category"]).to.equal(
+          "food"
+        );
+        expect(capturedCommand.input.ExpressionAttributeValues[":status"]).to.equal(
+          "active"
+        );
+      } finally {
+        // Restore original send method
+        mockDocClient.send = originalSend;
+      }
+    });
+
+    it("should handle queryGeohash without user-provided expression attributes", async () => {
+      // Regression test: ensure existing behavior still works
+      const hashKey = Long.fromNumber(123456);
+      const range = new GeohashRange(
+        Long.fromNumber(1000000),
+        Long.fromNumber(2000000)
+      );
+
+      const queryInput = {
+        Limit: 10,
+      };
+
+      let capturedCommand: any = null;
+      const originalSend = mockDocClient.send.bind(mockDocClient);
+      mockDocClient.send = async (command: any) => {
+        capturedCommand = command;
+        return {
+          Items: [],
+          Count: 0,
+          ScannedCount: 0,
+        };
+      };
+
+      try {
+        await ddbManager.queryGeohash(queryInput, hashKey, range);
+
+        expect(capturedCommand).to.exist;
+        expect(capturedCommand.input).to.exist;
+
+        // Verify only library's internal aliases are present
+        expect(capturedCommand.input.ExpressionAttributeNames).to.deep.equal({
+          "#hk": config.hashKeyAttributeName,
+          "#gh": config.geohashAttributeName,
+        });
+
+        expect(capturedCommand.input.ExpressionAttributeValues).to.include.keys(
+          ":hashKey",
+          ":minRange",
+          ":maxRange"
+        );
+
+        // Verify other query parameters are passed through
+        expect(capturedCommand.input.Limit).to.equal(10);
+      } finally {
+        mockDocClient.send = originalSend;
+      }
+    });
   });
 
   describe("updatePoint() with UpdateExpression validation", () => {

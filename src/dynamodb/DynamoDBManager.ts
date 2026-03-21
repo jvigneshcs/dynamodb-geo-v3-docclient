@@ -70,24 +70,70 @@ export class DynamoDBManager {
         range.rangeMax.toString(10)
       );
 
+      // Extract user-provided expression attributes for proper merging
+      const {
+        ExpressionAttributeNames: userNames,
+        ExpressionAttributeValues: userValues,
+        ...restQueryInput
+      } = queryInput || {};
+
+      // Library's internal reserved aliases
+      const libraryNames = {
+        "#hk": this.config.hashKeyAttributeName,
+        "#gh": this.config.geohashAttributeName,
+      };
+      const libraryValues = {
+        ":hashKey": parseFloat(hashKey.toString(10)),
+        ":minRange": minRange,
+        ":maxRange": maxRange,
+      };
+
+      // Validation: warn if user tries to override library's internal aliases
+      if (userNames) {
+        const reservedNames = ["#hk", "#gh"];
+        const conflicts = reservedNames.filter(key => key in userNames);
+        if (conflicts.length > 0) {
+          console.warn(
+            `Warning: User-provided ExpressionAttributeNames contain reserved aliases: ${conflicts.join(", ")}. ` +
+            `These are used internally by the library and will be overridden.`
+          );
+        }
+      }
+      if (userValues) {
+        const reservedValues = [":hashKey", ":minRange", ":maxRange"];
+        const conflicts = reservedValues.filter(key => key in userValues);
+        if (conflicts.length > 0) {
+          console.warn(
+            `Warning: User-provided ExpressionAttributeValues contain reserved aliases: ${conflicts.join(", ")}. ` +
+            `These are used internally by the library and will be overridden.`
+          );
+        }
+      }
+
       const defaults = {
         TableName: this.config.tableName,
         KeyConditionExpression: "#hk = :hashKey AND #gh BETWEEN :minRange AND :maxRange",
-        ExpressionAttributeNames: {
-          "#hk": this.config.hashKeyAttributeName,
-          "#gh": this.config.geohashAttributeName,
-        },
-        ExpressionAttributeValues: {
-          ":hashKey": parseFloat(hashKey.toString(10)),
-          ":minRange": minRange,
-          ":maxRange": maxRange,
-        },
         IndexName: this.config.geohashIndexName,
         ConsistentRead: this.config.consistentRead,
         ReturnConsumedCapacity: "TOTAL" as const,
         ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey }),
       };
-      const queryCommand = new QueryCommand({ ...defaults, ...queryInput });
+
+      // Merge expression attributes properly
+      const merged = {
+        ...defaults,
+        ...restQueryInput,
+        ExpressionAttributeNames: {
+          ...userNames,
+          ...libraryNames, // Library's aliases take precedence
+        },
+        ExpressionAttributeValues: {
+          ...userValues,
+          ...libraryValues, // Library's values take precedence
+        },
+      };
+
+      const queryCommand = new QueryCommand(merged);
       const queryOutput = await this.config.documentClient.send(queryCommand);
       queryOutputs.push(queryOutput);
       if (queryOutput.LastEvaluatedKey) {
