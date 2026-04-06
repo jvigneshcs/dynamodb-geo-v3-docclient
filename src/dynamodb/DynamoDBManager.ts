@@ -62,7 +62,7 @@ export class DynamoDBManager {
   ) {
     const queryOutputs: QueryCommandOutput[] = [];
 
-    const nextQuery = async (lastEvaluatedKey = null) => {
+    const nextQuery = async (lastEvaluatedKey: Record<string, any> | undefined | null = null) => {
       const minRange: NativeAttributeValue = BigInt(
         range.rangeMin.toString(10)
       );
@@ -116,7 +116,7 @@ export class DynamoDBManager {
         IndexName: this.config.geohashIndexName,
         ConsistentRead: this.config.consistentRead,
         ReturnConsumedCapacity: "TOTAL" as const,
-        ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey }),
+        ...(lastEvaluatedKey ? { ExclusiveStartKey: lastEvaluatedKey } : {}),
       };
 
       // Merge expression attributes properly
@@ -171,21 +171,22 @@ export class DynamoDBManager {
       geohashLong,
       this.config.hashKeyLength
     );
+    const item = putPointInput.PutItemInput.Item || {};
     const putItemInput: PutCommandInput = {
       ...putPointInput.PutItemInput,
       TableName: this.config.tableName,
-      Item: putPointInput.PutItemInput.Item || {},
+      Item: item,
     };
 
-    putItemInput.Item[this.config.hashKeyAttributeName] = parseFloat(
+    item[this.config.hashKeyAttributeName] = parseFloat(
       hashKey.toString(10)
     );
-    putItemInput.Item[this.config.rangeKeyAttributeName] =
+    item[this.config.rangeKeyAttributeName] =
       putPointInput.RangeKeyValue;
-    putItemInput.Item[this.config.geohashAttributeName] = BigInt(
+    item[this.config.geohashAttributeName] = BigInt(
       geohash.toString(10)
     );
-    putItemInput.Item[this.config.geoJsonAttributeName] = JSON.stringify({
+    item[this.config.geoJsonAttributeName] = JSON.stringify({
       type: this.config.geoJsonPointType,
       coordinates: this.config.longitudeFirst
         ? [putPointInput.GeoPoint.longitude, putPointInput.GeoPoint.latitude]
@@ -196,7 +197,7 @@ export class DynamoDBManager {
   }
 
   public batchWritePoints(putPointInputs: PutPointInput[]) {
-    const writeInputs = [];
+    const writeInputs: any[] = [];
     putPointInputs.forEach((putPointInput) => {
       const geohash = S2Manager.generateGeohash(putPointInput.GeoPoint);
       const geohashLong = Long.fromString(geohash.toString(), false, 10);

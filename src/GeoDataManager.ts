@@ -197,11 +197,11 @@ export class GeoDataManager {
    * @return Result of rectangle query request.
    */
   public async queryRectangle(queryRectangleInput: QueryRectangleInput) {
-    const latLngRect: Rect =
+    const latLngRect: Rect | null =
       S2Util.latLngRectFromQueryRectangleInput(queryRectangleInput);
 
     const covering = new Covering(
-      new this.config.S2RegionCoverer().covering(latLngRect)
+      latLngRect ? new this.config.S2RegionCoverer().covering(latLngRect) : []
     );
 
     const results = await this.dispatchQueries(covering, queryRectangleInput);
@@ -332,7 +332,7 @@ export class GeoDataManager {
     const mergedResults: Record<string, NativeAttributeValue>[] = [];
     results.forEach((queryOutputs) =>
       queryOutputs.forEach((queryOutput) =>
-        mergedResults.push(...queryOutput.Items)
+        mergedResults.push(...(queryOutput.Items || []))
       )
     );
     return mergedResults;
@@ -349,7 +349,7 @@ export class GeoDataManager {
     list: Record<string, NativeAttributeValue>[],
     geoQueryInput: QueryRadiusInput
   ): Record<string, NativeAttributeValue>[] {
-    let centerLatLng: LatLng = null;
+    let centerLatLng: LatLng | null = null;
     let radiusInMeter = 0;
 
     const centerPoint: GeoPoint = geoQueryInput.CenterPoint;
@@ -383,7 +383,7 @@ export class GeoDataManager {
     list: Record<string, NativeAttributeValue>[],
     geoQueryInput: QueryRectangleInput
   ): Record<string, NativeAttributeValue>[] {
-    const latLngRect: Rect =
+    const latLngRect: Rect | null =
       S2Util.latLngRectFromQueryRectangleInput(geoQueryInput);
 
     return list.filter((item) => {
@@ -393,7 +393,7 @@ export class GeoDataManager {
       const latitude = coordinates[this.config.longitudeFirst ? 1 : 0];
 
       const latLng: LatLng = LatLng.fromDegrees(latitude, longitude);
-      return latLngRect.containsLatLng(latLng);
+      return latLngRect != null && latLngRect.containsLatLng(latLng);
     });
   }
 }
