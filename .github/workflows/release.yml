@@ -6,6 +6,10 @@ on:
       - 'v*.*.*'  # Triggers on version tags like v1.2.0
   workflow_dispatch:  # Allows manual trigger
 
+# Opt into Node.js 24 for GitHub Actions to resolve the Node 20 deprecation warning
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -32,23 +36,13 @@ jobs:
           PKG_NAME=$(npm pack --dry-run 2>&1 | tail -1)
           echo "PACKAGE_FILE=$PKG_NAME" >> $GITHUB_ENV
       
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Replaces both create-release@v1 and upload-release-asset@v1
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: ./${{ env.PACKAGE_FILE }}
           draft: false
           prerelease: false
-      
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.PACKAGE_FILE }}
-          asset_name: ${{ env.PACKAGE_FILE }}
-          asset_content_type: application/gzip
