@@ -11,13 +11,13 @@ const EARTH_RADIUS_METERS = 6371000;
 export class S2Util {
   public static latLngRectFromQueryRectangleInput(
     geoQueryRequest: QueryRectangleInput
-  ): Rect {
+  ): Rect | null {
     const queryRectangleRequest = geoQueryRequest as QueryRectangleInput;
 
     const minPoint = queryRectangleRequest.MinPoint;
     const maxPoint = queryRectangleRequest.MaxPoint;
 
-    let latLngRect: Rect = null;
+    let latLngRect: Rect | null = null;
 
     if (minPoint != null && maxPoint != null) {
       const minLatLng = LatLng.fromDegrees(
